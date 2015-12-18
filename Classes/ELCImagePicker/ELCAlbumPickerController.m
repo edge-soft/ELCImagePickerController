@@ -102,7 +102,7 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
         });
     } else {
 //        //if ios 8 and above
-        NSLog(@"authorization status %li", (long)[PHPhotoLibrary authorizationStatus]);
+//        NSLog(@"authorization status %li", (long)[PHPhotoLibrary authorizationStatus]);
         [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
 //        [self updateFetchResults];
     }
