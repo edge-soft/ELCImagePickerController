@@ -266,19 +266,20 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
             
             //Compute the thumbnail pixel size:
             CGSize tableCellThumbnailSize1 = CGSizeMake(kAlbumThumbnailSize1.width*scale, kAlbumThumbnailSize1.height*scale);
-            PHAsset *asset = assetsFetchResult[0];
+            PHAsset *asset = assetsFetchResult.lastObject;
             
             PHImageRequestOptions *options = [[PHImageRequestOptions alloc] init];
             
             // Download from cloud if necessary
             options.networkAccessAllowed = YES;
-            options.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
-                
-            };
+        
+//            options.progressHandler = ^(double progress, NSError *error, BOOL *stop, NSDictionary *info) {
+//                
+//            };
             
             [self.imageManager requestImageForAsset:asset
                                          targetSize:tableCellThumbnailSize1
-                                        contentMode:PHImageContentModeAspectFill
+                                        contentMode:PHImageContentModeAspectFit
                                             options:options
                                       resultHandler:^(UIImage *result, NSDictionary *info)
              {
