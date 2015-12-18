@@ -148,6 +148,7 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
 
 
 - (void)viewWillAppear:(BOOL)animated {
+    [super viewWillAppear:animated];
     
     if(!IS_IOS8) {
          [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableView) name:ALAssetsLibraryChangedNotification object:nil];
@@ -162,6 +163,8 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
 }
 
 - (void)viewWillDisappear:(BOOL)animated {
+    [super viewWillDisappear:animated];
+    
     if(!IS_IOS8) {
         [[NSNotificationCenter defaultCenter] removeObserver:self name:ALAssetsLibraryChangedNotification object:nil];
     }

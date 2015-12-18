@@ -37,6 +37,8 @@
 
 - (void)viewDidLoad
 {
+    [super viewDidLoad];
+    
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 	[self.tableView setAllowsSelection:NO];
 
