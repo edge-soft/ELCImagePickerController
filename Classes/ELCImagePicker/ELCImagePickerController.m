@@ -137,6 +137,8 @@
 
                 [workingDictionary setObject:[[asset valueForProperty:ALAssetPropertyURLs] valueForKey:[[[asset valueForProperty:ALAssetPropertyURLs] allKeys] objectAtIndex:0]] forKey:UIImagePickerControllerReferenceURL];
                 
+                [workingDictionary setObject:[assetRep metadata] forKey:UIImagePickerControllerMediaMetadata];
+
                 [returnArray addObject:workingDictionary];
             }
             
