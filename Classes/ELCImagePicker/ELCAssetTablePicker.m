@@ -68,6 +68,9 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
+    
+}
+- (void)viewDidLayoutSubviews {
     self.columns = self.view.bounds.size.width / 80;
 }
 
