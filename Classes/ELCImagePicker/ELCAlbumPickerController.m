@@ -259,7 +259,7 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
         // } else {         if ios 8 and above
         NSDictionary *currentFetchResultRecord = [self.assetGroups objectAtIndex:indexPath.row];
         PHFetchResult *assetsFetchResult = [currentFetchResultRecord allValues][0];
-        cell.textLabel.text = [NSString stringWithFormat:@"%@ %lu", [currentFetchResultRecord allKeys][0],(unsigned long)assetsFetchResult.count];
+        cell.textLabel.text = [NSString stringWithFormat:@"%@ (%lu)", [currentFetchResultRecord allKeys][0],(unsigned long)assetsFetchResult.count];
         if([assetsFetchResult count]>0)
         {
             CGFloat scale = [UIScreen mainScreen].scale;
