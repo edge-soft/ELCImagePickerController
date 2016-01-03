@@ -42,7 +42,7 @@
 {
     //add photo framework for ios 8 and above
     
-    if(!IS_IOS8_OR_LATER) {
+    if(!IS_IOS8) {
         ALAssetsLibrary *library = [[ALAssetsLibrary alloc] init];
         self.specialLibrary = library;
         NSMutableArray *groups = [NSMutableArray array];
@@ -90,7 +90,7 @@
     
     // Move me
     tablePicker.assetGroup = group;
-    if (!IS_IOS8_OR_LATER) {
+    if (!IS_IOS8) {
         [((ALAssetsGroup*)tablePicker.assetGroup) setAssetsFilter:[ALAssetsFilter allAssets]];
     }
     
@@ -120,7 +120,7 @@
 	workingFrame.origin.x = 0;
     
     NSMutableArray *images = [NSMutableArray arrayWithCapacity:[info count]];
-    if(!IS_IOS8_OR_LATER) {
+    if(!IS_IOS8) {
         for (NSDictionary *dict in info) {
             if ([dict objectForKey:UIImagePickerControllerMediaType] == ALAssetTypePhoto){
                 if ([dict objectForKey:UIImagePickerControllerOriginalImage]){

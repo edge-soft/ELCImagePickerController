@@ -9,6 +9,6 @@
 #ifndef ELCConstants_h
 #define ELCConstants_h
 
-#define IS_IOS8 [[UIDevice currentDevice] systemVersion] >= 8.0
+#define IS_IOS8 ([[[UIDevice currentDevice] systemVersion] compare:@"8.0" options:NSNumericSearch] != NSOrderedAscending)
 
 #endif /* ELCConstants_h */
