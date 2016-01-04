@@ -63,7 +63,7 @@
 		32CA4F630368D1EE00C91783 /* ELCImagePickerDemo_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ELCImagePickerDemo_Prefix.pch; sourceTree = "<group>"; };
 		4AAFDA61194840F20020FCC4 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		5FAEB088190A3FA9002D73C4 /* ELCImagePickerHeader.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ELCImagePickerHeader.h; sourceTree = "<group>"; };
-		7E1BA03B1BCD2379004D158B /* ELCConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ELCConstants.h; path = "../../../HipPocket/hippocket-ios/NonPods/ELCImagePicker/ELCConstants.h"; sourceTree = "<group>"; };
+		7E1BA03B1BCD2379004D158B /* ELCConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ELCConstants.h; sourceTree = "<group>"; };
 		7E1BA03C1BCD23F7004D158B /* Photos.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Photos.framework; path = System/Library/Frameworks/Photos.framework; sourceTree = SDKROOT; };
 		83C6BC9514476B280064D71D /* elc-ios-icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "elc-ios-icon@2x.png"; sourceTree = "<group>"; };
 		83C6BC9614476B280064D71D /* elc-ios-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "elc-ios-icon.png"; sourceTree = "<group>"; };
