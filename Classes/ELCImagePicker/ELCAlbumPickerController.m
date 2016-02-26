@@ -58,7 +58,7 @@
                 if ([[sGroupPropertyName lowercaseString] isEqualToString:@"camera roll"] && nType == ALAssetsGroupSavedPhotos) {
                     [self.assetGroups insertObject:group atIndex:0];
                 }
-                else {
+                else if ([group numberOfAssets] > 0) {
                     [self.assetGroups addObject:group];
                 }
 
