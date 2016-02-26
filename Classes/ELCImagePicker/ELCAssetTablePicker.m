@@ -11,6 +11,10 @@
 #import "ELCAlbumPickerController.h"
 #import "ELCConsole.h"
 
+static NSInteger const kELCAssetTablePickerColumns = 4;
+static CGFloat const kELCAssetCellPadding = 4.0f;
+static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
+
 @interface ELCAssetTablePicker ()
 
 @property (nonatomic, assign) int columns;
@@ -21,21 +25,19 @@
 
 //Using auto synthesizers
 
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        //Sets a reasonable default bigger then 0 for columns
-        //So that we don't have a divide by 0 scenario
-        self.columns = 4;
-    }
-    return self;
-}
-
 - (void)viewDidLoad
 {
+    [super viewDidLoad];
+    
+    //Sets a reasonable default bigger then 0 for columns
+    //So that we don't have a divide by 0 scenario
+    self.columns = kELCAssetTablePickerColumns;
+    
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 	[self.tableView setAllowsSelection:NO];
+    
+    //Ensure that the the table has the same padding above the first row and below the last row
+    self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, kELCAssetCellPadding)];
 
     NSMutableArray *tempArray = [[NSMutableArray alloc] init];
     self.elcAssets = tempArray;
@@ -57,7 +59,7 @@
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    self.columns = self.view.bounds.size.width / 80;
+    self.columns = self.view.bounds.size.width / kELCAssetDefaultItemWidth;
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -72,10 +74,10 @@
     return YES;
 }
 
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
+- (void)willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
-    [super didRotateFromInterfaceOrientation:fromInterfaceOrientation];
-    self.columns = self.view.bounds.size.width / 80;
+    [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
+    self.columns = self.view.bounds.size.width / kELCAssetDefaultItemWidth;
     [self.tableView reloadData];
 }
 
@@ -127,7 +129,7 @@
 
 - (void)doneAction:(id)sender
 {	
-	NSMutableArray *selectedAssetsImages = [[NSMutableArray alloc] init];
+    NSMutableArray *selectedAssetsImages = [[NSMutableArray alloc] init];
 	    
 	for (ELCAsset *elcAsset in self.elcAssets) {
 		if ([elcAsset selected]) {
@@ -232,10 +234,9 @@
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     if (self.columns <= 0) { //Sometimes called before we know how many columns we have
-        self.columns = 4;
+        self.columns = kELCAssetTablePickerColumns;
     }
-    NSInteger numRows = ceil([self.elcAssets count] / (float)self.columns);
-    return numRows;
+    return ceil([self.elcAssets count] / (float)self.columns);
 }
 
 - (NSArray *)assetsForIndexPath:(NSIndexPath *)path
@@ -255,6 +256,8 @@
     if (cell == nil) {		        
         cell = [[ELCAssetCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
+    cell.itemPadding = kELCAssetCellPadding;
+    cell.numberOfColumns = self.columns;
     
     [cell setAssets:[self assetsForIndexPath:indexPath]];
     
@@ -263,7 +266,8 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	return 79;
+    CGFloat height = ceilf((tableView.frame.size.width - (self.columns+1) * kELCAssetCellPadding) / self.columns + kELCAssetCellPadding);
+    return height;
 }
 
 - (int)totalSelectedAssets

@@ -66,7 +66,7 @@ static ELCConsole *_mainconsole;
 
 - (int)numOfSelectedElements {
     
-    return [myIndex count];
+    return (int)[myIndex count];
 }
 
 @end
