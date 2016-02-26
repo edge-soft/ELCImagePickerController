@@ -18,6 +18,7 @@
 @property (nonatomic, strong) NSMutableArray *imageViewArray;
 @property (nonatomic, strong) NSMutableArray *overlayViewArray;
 @property (strong) PHCachingImageManager *imageManager;
+@property (nonatomic) CGFloat itemDimension;
 
 @end
 
@@ -29,6 +30,10 @@
 {
     self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:reuseIdentifier];
 	if (self) {
+        self.numberOfColumns = 4;
+        self.itemDimension = 75;
+        self.itemPadding = 4.0f;
+        
         UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(cellTapped:)];
         [self addGestureRecognizer:tapRecognizer];
         
@@ -138,16 +143,16 @@
 {
     CGPoint point = [tapRecognizer locationInView:self];
     int c = (int32_t)self.rowAssets.count;
-    CGFloat totalWidth = c * 75 + (c - 1) * 4;
+    CGFloat totalWidth = c * self.itemDimension + (c - 1) * self.itemPadding;
     CGFloat startX;
     
     if (self.alignmentLeft) {
-        startX = 4;
+        startX = self.itemPadding;
     }else {
         startX = (self.bounds.size.width - totalWidth) / 2;
     }
     
-	CGRect frame = CGRectMake(startX, 2, 75, 75);
+	CGRect frame = CGRectMake(startX, self.bounds.size.height/2 - self.itemDimension/2, self.itemDimension, self.itemDimension);
 	
 	for (int i = 0; i < [_rowAssets count]; ++i) {
         if (CGRectContainsPoint(frame, point)) {
@@ -167,23 +172,24 @@
             }
             break;
         }
-        frame.origin.x = frame.origin.x + frame.size.width + 4;
+        frame.origin.x = frame.origin.x + frame.size.width + self.itemPadding;
     }
 }
 
 - (void)layoutSubviews
 {
+    self.itemDimension = (self.bounds.size.width - (self.numberOfColumns +1) * self.itemPadding) / self.numberOfColumns;
     int c = (int32_t)self.rowAssets.count;
-    CGFloat totalWidth = c * 75 + (c - 1) * 4;
+    CGFloat totalWidth = c * self.itemDimension + (c - 1) * self.itemPadding;
     CGFloat startX;
     
     if (self.alignmentLeft) {
-        startX = 4;
+        startX = self.itemPadding;
     }else {
         startX = (self.bounds.size.width - totalWidth) / 2;
     }
     
-	CGRect frame = CGRectMake(startX, 2, 75, 75);
+	CGRect frame = CGRectMake(startX, self.itemPadding, self.itemDimension, self.itemDimension);
 	
 	for (int i = 0; i < [_rowAssets count]; ++i) {
 		UIImageView *imageView = [_imageViewArray objectAtIndex:i];
@@ -194,7 +200,7 @@
         [overlayView setFrame:frame];
         [self addSubview:overlayView];
 		
-		frame.origin.x = frame.origin.x + frame.size.width + 4;
+		frame.origin.x = frame.origin.x + frame.size.width + self.itemPadding;
 	}
 }
 

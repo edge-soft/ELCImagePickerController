@@ -312,7 +312,7 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	ELCAssetTablePicker *picker = [[ELCAssetTablePicker alloc] initWithNibName: nil bundle: nil];
+	ELCAssetTablePicker *picker = [[ELCAssetTablePicker alloc] init];
 	picker.parent = self;
 
     

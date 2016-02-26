@@ -11,6 +11,8 @@
 @interface ELCAssetCell : UITableViewCell
 
 @property (nonatomic, assign) BOOL alignmentLeft;
+@property (nonatomic, assign) CGFloat itemPadding;
+@property (nonatomic, assign) NSInteger numberOfColumns;
 
 - (void)setAssets:(NSArray *)assets;
 
