@@ -256,6 +256,12 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
     for (int i = 0; i < self.elcAssets.count; i++) {
         ELCAsset *elcAsset = [self.elcAssets objectAtIndex:i];
         elcAsset.selected = YES;
+        
+        //Incase reached limit of selection
+        if (!elcAsset.selected) {
+            break;
+        }
+        
         elcAsset.index = i;
         [[ELCConsole mainConsole] addIndex:i];
     }
