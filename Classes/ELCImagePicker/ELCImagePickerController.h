@@ -54,6 +54,15 @@
  */
 @property (nonatomic, assign) BOOL returnsOriginalImage;
 
+/**
+ * Customize toolbar appearance
+ */
+@property (nonatomic, assign) BOOL enableToolbar;
+@property (nonatomic, strong) UIColor *toolbarTintColor;
+@property (nonatomic, strong) UIColor *toolbarBarTintColor;
+@property (nonatomic, strong) UIImage *toolbarBackgroundImage;
+@property (nonatomic, assign) UIBarStyle toolbarStyle;
+
 - (id)initImagePicker;
 - (void)cancelImagePicker;
 

@@ -19,13 +19,6 @@
 @property (nonatomic, strong) IBOutlet UILabel *selectedAssetsLabel;
 @property (nonatomic, assign) BOOL singleSelection;
 @property (nonatomic, assign) BOOL immediateReturn;
-@property (nonatomic, assign) BOOL enableToolbar;
-
-// Toolbar Appearance
-@property (nonatomic, strong) UIColor *toolbarTintColor;
-@property (nonatomic, strong) UIColor *toolbarBarTintColor;
-@property (nonatomic, strong) UIImage *toolbarBackgroundImage;
-@property (nonatomic, assign) UIBarStyle toolbarStyle;
 
 // optional, can be used to filter the assets displayed
 @property(nonatomic, weak) id<ELCAssetPickerFilterDelegate> assetPickerFilterDelegate;

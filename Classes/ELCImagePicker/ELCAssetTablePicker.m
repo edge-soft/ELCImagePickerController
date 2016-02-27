@@ -27,21 +27,6 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
 
 //Using auto synthesizers
 
-- (id)init
-{
-    self = [super init];
-    if (self) {
-        [self _initialisation];
-    }
-    return self;
-}
-
-- (void)_initialisation
-{
-    _enableToolbar = YES;
-    _toolbarStyle = UIBarStyleDefault;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -62,7 +47,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, kELCAssetCellPadding)];
     
     //Toolbar
-    if (self.enableToolbar) {
+    if ([ELCConsole mainConsole].enableToolbar) {
         [self.view addSubview:self.toolbar];
         [self updateToolbarAppearance];
         [self setupToolbarItems];
@@ -358,11 +343,11 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
 }
 
 - (void)updateToolbarAppearance {
-    _toolbar.barStyle = _toolbarStyle;
-    _toolbar.tintColor = _toolbarTintColor;
-    _toolbar.barTintColor = _toolbarBarTintColor;
-    [_toolbar setBackgroundImage:_toolbarBackgroundImage forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
-    [_toolbar setBackgroundImage:_toolbarBackgroundImage forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsLandscapePhone];
+    _toolbar.barStyle = [ELCConsole mainConsole].toolbarStyle;
+    _toolbar.tintColor = [ELCConsole mainConsole].toolbarTintColor;
+    _toolbar.barTintColor = [ELCConsole mainConsole].toolbarBarTintColor;
+    [_toolbar setBackgroundImage:[ELCConsole mainConsole].toolbarBackgroundImage forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+    [_toolbar setBackgroundImage:[ELCConsole mainConsole].toolbarBackgroundImage forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsLandscapePhone];
 }
 
 - (void)setupToolbarItems {
