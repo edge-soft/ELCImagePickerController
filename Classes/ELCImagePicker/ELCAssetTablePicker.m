@@ -307,6 +307,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
     }
     cell.itemPadding = kELCAssetCellPadding;
     cell.numberOfColumns = self.columns;
+    cell.parent = self;
     
     [cell setAssets:[self assetsForIndexPath:indexPath]];
     
