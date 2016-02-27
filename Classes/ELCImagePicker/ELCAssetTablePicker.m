@@ -65,6 +65,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
     if (self.enableToolbar) {
         [self.view addSubview:self.toolbar];
         [self updateToolbarAppearance];
+        [self setupToolbarItems];
         [self setToolbarHidden:YES animated:NO];
     }
     
@@ -108,6 +109,10 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
     [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
     self.columns = self.view.bounds.size.width / kELCAssetDefaultItemWidth;
     [self.tableView reloadData];
+    
+    //Update toolbar frame
+    _toolbar.frame = [self frameForToolbarAtOrientation:[self statusOrientation]];
+    [self setupToolbarItems];
 }
 
 - (void)preparePhotos
@@ -260,6 +265,27 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
         [self hideToolbar];
 }
 
+- (void)assetSelectAll {
+    [[ELCConsole mainConsole] removeAllIndex];
+    
+    for (int i = 0; i < self.elcAssets.count; i++) {
+        ELCAsset *elcAsset = [self.elcAssets objectAtIndex:i];
+        elcAsset.selected = YES;
+        elcAsset.index = i;
+        [[ELCConsole mainConsole] addIndex:i];
+    }
+    [self.tableView reloadData];
+}
+
+- (void)assetDeselectAll {
+    for (ELCAsset *elcAsset in self.elcAssets) {
+        elcAsset.selected = NO;
+    }
+    [[ELCConsole mainConsole] removeAllIndex];
+    
+    [self.tableView reloadData];
+}
+
 #pragma mark UITableViewDataSource Delegate Methods
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -337,6 +363,27 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
     _toolbar.barTintColor = _toolbarBarTintColor;
     [_toolbar setBackgroundImage:_toolbarBackgroundImage forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
     [_toolbar setBackgroundImage:_toolbarBackgroundImage forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsLandscapePhone];
+}
+
+- (void)setupToolbarItems {
+    CGSize buttonSize = CGSizeMake(_toolbar.frame.size.width/2, _toolbar.frame.size.height);
+    
+    UIButton *templateButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    templateButton.frame = CGRectMake(0, 0, buttonSize.width, buttonSize.height);
+    [templateButton setTitle:@"Select All" forState:UIControlStateNormal];
+    [templateButton addTarget:self action:@selector(assetSelectAll) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *selectAllButton = [[UIBarButtonItem alloc] initWithCustomView:templateButton];
+
+    templateButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    templateButton.frame = CGRectMake(buttonSize.width, 0, buttonSize.width, buttonSize.height);
+    [templateButton setTitle:@"Deselect All" forState:UIControlStateNormal];
+    [templateButton addTarget:self action:@selector(assetDeselectAll) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *deselectAllButton = [[UIBarButtonItem alloc] initWithCustomView:templateButton];
+    
+    UIBarButtonItem *negativeSeparator = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    negativeSeparator.width = -16;
+    
+    [_toolbar setItems:@[negativeSeparator, selectAllButton, negativeSeparator, deselectAllButton]];
 }
 
 - (void)showToolbar { [self setToolbarHidden:NO animated:YES]; }
