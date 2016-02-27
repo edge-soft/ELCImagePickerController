@@ -18,6 +18,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
 @interface ELCAssetTablePicker ()
 
 @property (nonatomic, assign) int columns;
+@property (nonatomic, strong) UITableView *tableView;
 
 @end
 
@@ -33,15 +34,20 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
     //So that we don't have a divide by 0 scenario
     self.columns = kELCAssetTablePickerColumns;
     
+    self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 	[self.tableView setAllowsSelection:NO];
+    self.tableView.delegate = self;
+    self.tableView.dataSource = self;
+    
+    [self.view addSubview:self.tableView];
     
     //Ensure that the the table has the same padding above the first row and below the last row
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, kELCAssetCellPadding)];
 
     NSMutableArray *tempArray = [[NSMutableArray alloc] init];
     self.elcAssets = tempArray;
-	
+    
     if (self.immediateReturn) {
         
     } else {

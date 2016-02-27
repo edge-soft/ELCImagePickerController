@@ -61,7 +61,7 @@
 
 - (void)displayPickerForGroup:(ALAssetsGroup *)group
 {
-	ELCAssetTablePicker *tablePicker = [[ELCAssetTablePicker alloc] initWithStyle:UITableViewStylePlain];
+	ELCAssetTablePicker *tablePicker = [[ELCAssetTablePicker alloc] init];
     tablePicker.singleSelection = YES;
     tablePicker.immediateReturn = YES;
     
