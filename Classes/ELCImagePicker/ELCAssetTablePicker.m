@@ -93,6 +93,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
 {
     [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
     self.columns = self.view.bounds.size.width / kELCAssetDefaultItemWidth;
+    self.tableView.frame = self.view.bounds;
     [self.tableView reloadData];
     
     //Update toolbar frame
@@ -391,8 +392,14 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
     [UIView animateWithDuration:animateDuration animations:^{
         _toolbar.frame = [self frameForToolbarAtOrientation:[self statusOrientation]];
         
-        if (hidden)
+        if (hidden) {
             _toolbar.frame = CGRectOffset(_toolbar.frame, 0, animatonOffset);
+            _tableView.frame = self.view.bounds;
+        } else {
+            CGRect frame = _tableView.frame;
+            frame.size.height = frame.size.height - _toolbar.frame.size.height;
+            _tableView.frame = frame;
+        }
         
         _toolbar.alpha = alpha;
     }];
