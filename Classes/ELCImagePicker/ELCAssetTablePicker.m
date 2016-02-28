@@ -251,10 +251,11 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
 }
 
 - (void)assetSelectAll {
-    [[ELCConsole mainConsole] removeAllIndex];
-    
     for (int i = 0; i < self.elcAssets.count; i++) {
         ELCAsset *elcAsset = [self.elcAssets objectAtIndex:i];
+        if (elcAsset.selected)
+            continue;
+        
         elcAsset.selected = YES;
         
         //Incase reached limit of selection
@@ -262,8 +263,8 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
             break;
         }
         
-        elcAsset.index = i;
-        [[ELCConsole mainConsole] addIndex:i];
+        elcAsset.index = [[ELCConsole mainConsole] numOfSelectedElements];
+        [[ELCConsole mainConsole] addIndex:elcAsset.index];
     }
     [self.tableView reloadData];
 }
