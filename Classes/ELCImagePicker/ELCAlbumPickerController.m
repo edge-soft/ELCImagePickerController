@@ -76,8 +76,10 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
                     [self performSelectorOnMainThread:@selector(reloadTableView) withObject:nil waitUntilDone:YES];
                 };
                 
+
                 // Group Enumerator Failure Block
                 void (^assetGroupEnumberatorFailure)(NSError *) = ^(NSError *error) {
+
                   
                     if ([ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusDenied) {
                         NSString *errorMessage = NSLocalizedString(@"This app does not have access to your photos or videos. You can enable access in Privacy Settings.", nil);

@@ -7,12 +7,20 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface ELCConsole : NSObject
 {
     NSMutableArray *myIndex;
 }
 @property (nonatomic,assign) BOOL onOrder;
+
+@property (nonatomic, assign) BOOL enableToolbar;
+@property (nonatomic, strong) UIColor *toolbarTintColor;
+@property (nonatomic, strong) UIColor *toolbarBarTintColor;
+@property (nonatomic, strong) UIImage *toolbarBackgroundImage;
+@property (nonatomic, assign) UIBarStyle toolbarStyle;
+
 + (ELCConsole *)mainConsole;
 - (void)addIndex:(int)index;
 - (void)removeIndex:(int)index;

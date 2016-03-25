@@ -17,7 +17,9 @@
 @property (nonatomic, strong) NSArray *rowAssets;
 @property (nonatomic, strong) NSMutableArray *imageViewArray;
 @property (nonatomic, strong) NSMutableArray *overlayViewArray;
+
 @property (strong) PHCachingImageManager *imageManager;
+
 @property (nonatomic) CGFloat itemDimension;
 
 @end
@@ -157,6 +159,14 @@
 	for (int i = 0; i < [_rowAssets count]; ++i) {
         if (CGRectContainsPoint(frame, point)) {
             ELCAsset *asset = [_rowAssets objectAtIndex:i];
+            
+            //If selection reached maximum limit then just can deselect only
+            if (!asset.selected && [_parent respondsToSelector:@selector(shouldSelectAsset:)])
+            {
+                if (![_parent shouldSelectAsset:nil])
+                    return;
+            }
+            
             asset.selected = !asset.selected;
             ELCOverlayImageView *overlayView = [_overlayViewArray objectAtIndex:i];
             overlayView.hidden = !asset.selected;

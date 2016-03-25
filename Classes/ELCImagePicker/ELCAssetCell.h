@@ -6,10 +6,11 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "ELCAsset.h"
 
 @interface ELCAssetCell : UITableViewCell
 
+@property (nonatomic, weak) id<ELCAssetDelegate> parent;
 @property (nonatomic, assign) BOOL alignmentLeft;
 @property (nonatomic, assign) CGFloat itemPadding;
 @property (nonatomic, assign) NSInteger numberOfColumns;

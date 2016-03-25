@@ -18,7 +18,11 @@
 
 
 
+
+
 @property (nonatomic, assign) int columns;
+@property (nonatomic, strong) UITableView *tableView;
+@property (nonatomic, strong) UIToolbar *toolbar;
 
 @end
 
@@ -28,26 +32,37 @@ static NSInteger const kELCAssetTablePickerColumns = 4;
 static CGFloat const kELCAssetCellPadding = 4.0f;
 static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
 
-//Using auto synthesizers
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     
-
     //Sets a reasonable default bigger then 0 for columns
     //So that we don't have a divide by 0 scenario
     self.columns = kELCAssetTablePickerColumns;
     
+
+    self.tableView = [[UITableView alloc] initWithFrame:self.view.bounds];
     [self.tableView setSeparatorStyle:UITableViewCellSeparatorStyleNone];
 	[self.tableView setAllowsSelection:NO];
+    self.tableView.delegate = self;
+    self.tableView.dataSource = self;
+    
+    [self.view addSubview:self.tableView];
     
     //Ensure that the the table has the same padding above the first row and below the last row
     self.tableView.tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, self.tableView.frame.size.width, kELCAssetCellPadding)];
+    
+    //Toolbar
+    if ([ELCConsole mainConsole].enableToolbar) {
+        [self.view addSubview:self.toolbar];
+        [self updateToolbarAppearance];
+        [self setupToolbarItems];
+        [self setToolbarHidden:YES animated:NO];
+    }
 
     NSMutableArray *tempArray = [[NSMutableArray alloc] init];
     self.elcAssets = tempArray;
-	
+    
     if (self.immediateReturn) {
         
     } else {
@@ -100,7 +115,13 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
 {
     [super willAnimateRotationToInterfaceOrientation:toInterfaceOrientation duration:duration];
     self.columns = self.view.bounds.size.width / kELCAssetDefaultItemWidth;
+    self.tableView.frame = self.view.bounds;
+
     [self.tableView reloadData];
+    
+    //Update toolbar frame
+    _toolbar.frame = [self frameForToolbarAtOrientation:[self statusOrientation]];
+    [self setupToolbarItems];
 }
 
 - (void)preparePhotos
@@ -228,6 +249,11 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
         NSArray *singleAssetArray = @[asset];
         [(NSObject *)self.parent performSelector:@selector(selectedAssets:) withObject:singleAssetArray afterDelay:0];
     }
+    
+    if (_toolbar.alpha == 1)
+        return;
+    
+    [self showToolbar];
 }
 
 - (BOOL)shouldDeselectAsset:(ELCAsset *)asset
@@ -278,6 +304,38 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
         }
         [self.tableView reloadRowsAtIndexPaths:arrayOfCellsToReload withRowAnimation:UITableViewRowAnimationNone];
     }
+    
+    //If there are no photo selected then hide Toolbar
+    if ([self totalSelectedAssets] == 0)
+        [self hideToolbar];
+}
+
+- (void)assetSelectAll {
+    for (int i = 0; i < self.elcAssets.count; i++) {
+        ELCAsset *elcAsset = [self.elcAssets objectAtIndex:i];
+        if (elcAsset.selected)
+            continue;
+        
+        elcAsset.selected = YES;
+        
+        //Incase reached limit of selection
+        if (!elcAsset.selected) {
+            break;
+        }
+        
+        elcAsset.index = [[ELCConsole mainConsole] numOfSelectedElements];
+        [[ELCConsole mainConsole] addIndex:elcAsset.index];
+    }
+    [self.tableView reloadData];
+}
+
+- (void)assetDeselectAll {
+    for (ELCAsset *elcAsset in self.elcAssets) {
+        elcAsset.selected = NO;
+    }
+    [[ELCConsole mainConsole] removeAllIndex];
+    
+    [self.tableView reloadData];
 }
 
 #pragma mark UITableViewDataSource Delegate Methods
@@ -316,6 +374,8 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
     }
     cell.itemPadding = kELCAssetCellPadding;
     cell.numberOfColumns = self.columns;
+
+    cell.parent = self;
     
     [cell setAssets:[self assetsForIndexPath:indexPath]];
     
@@ -352,5 +412,81 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
     }
 }
 
+#pragma mark - Toolbar
+- (UIToolbar *)toolbar {
+    if (!_toolbar) {
+        _toolbar = [[UIToolbar alloc] initWithFrame:[self frameForToolbarAtOrientation:[self statusOrientation]]];
+        _toolbar.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleWidth;
+    }
+    
+    return _toolbar;
+}
+
+- (void)updateToolbarAppearance {
+    _toolbar.barStyle = [ELCConsole mainConsole].toolbarStyle;
+    _toolbar.tintColor = [ELCConsole mainConsole].toolbarTintColor;
+    _toolbar.barTintColor = [ELCConsole mainConsole].toolbarBarTintColor;
+    [_toolbar setBackgroundImage:[ELCConsole mainConsole].toolbarBackgroundImage forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsDefault];
+    [_toolbar setBackgroundImage:[ELCConsole mainConsole].toolbarBackgroundImage forToolbarPosition:UIBarPositionAny barMetrics:UIBarMetricsLandscapePhone];
+}
+
+- (void)setupToolbarItems {
+    CGSize buttonSize = CGSizeMake(_toolbar.frame.size.width/2, _toolbar.frame.size.height);
+    
+    UIButton *templateButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    templateButton.frame = CGRectMake(0, 0, buttonSize.width, buttonSize.height);
+    [templateButton setTitle:@"Select All" forState:UIControlStateNormal];
+    [templateButton addTarget:self action:@selector(assetSelectAll) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *selectAllButton = [[UIBarButtonItem alloc] initWithCustomView:templateButton];
+
+    templateButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    templateButton.frame = CGRectMake(buttonSize.width, 0, buttonSize.width, buttonSize.height);
+    [templateButton setTitle:@"Deselect All" forState:UIControlStateNormal];
+    [templateButton addTarget:self action:@selector(assetDeselectAll) forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *deselectAllButton = [[UIBarButtonItem alloc] initWithCustomView:templateButton];
+    
+    UIBarButtonItem *negativeSeparator = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFixedSpace target:nil action:nil];
+    negativeSeparator.width = -16;
+    
+    [_toolbar setItems:@[negativeSeparator, selectAllButton, negativeSeparator, deselectAllButton]];
+}
+
+- (void)showToolbar { [self setToolbarHidden:NO animated:YES]; }
+- (void)hideToolbar { [self setToolbarHidden:YES animated:YES]; }
+
+- (void)setToolbarHidden:(BOOL)hidden animated:(BOOL)animated {
+    
+    CGFloat alpha = hidden ? 0 : 1;
+    CGFloat animateDuration = animated ? 0.3 : 0;
+    CGFloat animatonOffset = 20;
+    
+    [UIView animateWithDuration:animateDuration animations:^{
+        _toolbar.frame = [self frameForToolbarAtOrientation:[self statusOrientation]];
+        
+        if (hidden) {
+            _toolbar.frame = CGRectOffset(_toolbar.frame, 0, animatonOffset);
+            _tableView.frame = self.view.bounds;
+        } else {
+            CGRect frame = _tableView.frame;
+            frame.size.height = frame.size.height - _toolbar.frame.size.height;
+            _tableView.frame = frame;
+        }
+        
+        _toolbar.alpha = alpha;
+    }];
+}
+
+#pragma mark - Frame Calculation
+
+- (CGRect)frameForToolbarAtOrientation:(UIInterfaceOrientation)orientation {
+    CGFloat height = 44;
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone &&
+        UIInterfaceOrientationIsLandscape(orientation)) height = 32;
+    return CGRectIntegral(CGRectMake(0, self.view.bounds.size.height - height, self.view.bounds.size.width, height));
+}
+
+- (UIInterfaceOrientation)statusOrientation {
+    return [[UIApplication sharedApplication] statusBarOrientation];
+}
 
 @end

@@ -30,6 +30,7 @@
         self.maximumImagesCount = 4;
         self.returnsImage = YES;
         self.returnsOriginalImage = YES;
+        self.enableToolbar = YES;
         [albumPicker setParent:self];
         self.mediaTypes = @[(NSString *)kUTTypeImage, (NSString *)kUTTypeMovie];
     }
@@ -43,6 +44,7 @@
     if (self) {
         self.maximumImagesCount = 4;
         self.returnsImage = YES;
+        self.enableToolbar = YES;
     }
     return self;
 }
@@ -172,6 +174,31 @@
 - (void)setOnOrder:(BOOL)onOrder
 {
     [[ELCConsole mainConsole] setOnOrder:onOrder];
+}
+
+- (void)setEnableToolbar:(BOOL)enableToolbar
+{
+    [ELCConsole mainConsole].enableToolbar          = enableToolbar;
+}
+
+- (void)setToolbarTintColor:(UIColor *)toolbarTintColor
+{
+    [ELCConsole mainConsole].toolbarTintColor       = toolbarTintColor;
+}
+
+- (void)setToolbarBarTintColor:(UIColor *)toolbarBarTintColor
+{
+    [ELCConsole mainConsole].toolbarBarTintColor    = toolbarBarTintColor;
+}
+
+- (void)setToolbarBackgroundImage:(UIImage *)toolbarBackgroundImage
+{
+    [ELCConsole mainConsole].toolbarBackgroundImage = toolbarBackgroundImage;
+}
+
+- (void)setToolbarStyle:(UIBarStyle)toolbarStyle
+{
+    [ELCConsole mainConsole].toolbarStyle           = toolbarStyle;
 }
 
 @end
