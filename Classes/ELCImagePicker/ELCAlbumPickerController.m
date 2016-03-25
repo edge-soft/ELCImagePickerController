@@ -15,7 +15,7 @@
 
 @interface ELCAlbumPickerController () <PHPhotoLibraryChangeObserver>
 
-@property (nonatomic, strong) ALAssetsLibrary *library;
+//@property (nonatomic, strong) ALAssetsLibrary *library;
 @property (strong) PHCachingImageManager *imageManager;
 
 @end
@@ -42,72 +42,18 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
     NSMutableArray *tempArray = [[NSMutableArray alloc] init];
 	self.assetGroups = tempArray;
     
-    ALAssetsLibrary *assetLibrary = [[ALAssetsLibrary alloc] init];
-    self.library = assetLibrary;
+//    ALAssetsLibrary *assetLibrary = [[ALAssetsLibrary alloc] init];
+//    self.library = assetLibrary;
     
     self.imageManager = [[PHCachingImageManager alloc] init];
 
     // Load Albums into assetGroups
-    if(!IS_IOS8) {
-        dispatch_async(dispatch_get_main_queue(), ^
-        {
-            @autoreleasepool {
-            
-            // Group enumerator Block
-                
-                void (^assetGroupEnumerator)(ALAssetsGroup *, BOOL *) = ^(ALAssetsGroup *group, BOOL *stop) 
-                {
-                    if (group == nil) {
-                        return;
-                    }
-                    
-                    // added fix for camera albums order
-                    NSString *sGroupPropertyName = (NSString *)[group valueForProperty:ALAssetsGroupPropertyName];
-                    NSUInteger nType = [[group valueForProperty:ALAssetsGroupPropertyType] intValue];
-                    
-                    if ([[sGroupPropertyName lowercaseString] isEqualToString:@"camera roll"] && nType == ALAssetsGroupSavedPhotos) {
-                        [self.assetGroups insertObject:group atIndex:0];
-                    }
-                    else {
-                        [self.assetGroups addObject:group];
-                    }
-
-                    // Reload albums
-                    [self performSelectorOnMainThread:@selector(reloadTableView) withObject:nil waitUntilDone:YES];
-                };
-                
-
-                // Group Enumerator Failure Block
-                void (^assetGroupEnumberatorFailure)(NSError *) = ^(NSError *error) {
-
-                  
-                    if ([ALAssetsLibrary authorizationStatus] == ALAuthorizationStatusDenied) {
-                        NSString *errorMessage = NSLocalizedString(@"This app does not have access to your photos or videos. You can enable access in Privacy Settings.", nil);
-                        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Access Denied", nil) message:errorMessage delegate:nil cancelButtonTitle:NSLocalizedString(@"Ok", nil) otherButtonTitles:nil] show];
-                      
-                    } else {
-                        NSString *errorMessage = [NSString stringWithFormat:@"Album Error: %@ - %@", [error localizedDescription], [error localizedRecoverySuggestion]];
-                        [[[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Error", nil) message:errorMessage delegate:nil cancelButtonTitle:NSLocalizedString(@"Ok", nil) otherButtonTitles:nil] show];
-                    }
-
-                    [self.navigationItem setTitle:nil];
-                    NSLog(@"A problem occured %@", [error description]);	                                 
-                };	
-                        
-                // Enumerate Albums
-                
-                [self.library enumerateGroupsWithTypes:ALAssetsGroupAll
-                                       usingBlock:assetGroupEnumerator
-                                      failureBlock:assetGroupEnumberatorFailure];
-
-            }
-        });
-    } else {
+    
 //        //if ios 8 and above
 //        NSLog(@"authorization status %li", (long)[PHPhotoLibrary authorizationStatus]);
         [[PHPhotoLibrary sharedPhotoLibrary] registerChangeObserver:self];
 //        [self updateFetchResults];
-    }
+    
 }
 
 -(void)updateFetchResults
@@ -152,13 +98,11 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     
-    if(!IS_IOS8) {
-         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(reloadTableView) name:ALAssetsLibraryChangedNotification object:nil];
-    }else {
+    
         //if ios 8 and above
         [self updateFetchResults];
         
-    }
+    
     
    
     [self.tableView reloadData];
@@ -166,10 +110,6 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
 
 - (void)viewWillDisappear:(BOOL)animated {
     [super viewWillDisappear:animated];
-    
-    if(!IS_IOS8) {
-        [[NSNotificationCenter defaultCenter] removeObserver:self name:ALAssetsLibraryChangedNotification object:nil];
-    }
 }
 
 - (void)dealloc
@@ -197,22 +137,22 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
 {
 	[_parent selectedAssets:assets];
 }
-
-- (ALAssetsFilter *)assetFilter
-{
-    if([self.mediaTypes containsObject:(NSString *)kUTTypeImage] && [self.mediaTypes containsObject:(NSString *)kUTTypeMovie])
-    {
-        return [ALAssetsFilter allAssets];
-    }
-    else if([self.mediaTypes containsObject:(NSString *)kUTTypeMovie])
-    {
-        return [ALAssetsFilter allVideos];
-    }
-    else
-    {
-        return [ALAssetsFilter allPhotos];
-    }
-}
+//
+//- (ALAssetsFilter *)assetFilter
+//{
+//    if([self.mediaTypes containsObject:(NSString *)kUTTypeImage] && [self.mediaTypes containsObject:(NSString *)kUTTypeMovie])
+//    {
+//        return [ALAssetsFilter allAssets];
+//    }
+//    else if([self.mediaTypes containsObject:(NSString *)kUTTypeMovie])
+//    {
+//        return [ALAssetsFilter allVideos];
+//    }
+//    else
+//    {
+//        return [ALAssetsFilter allPhotos];
+//    }
+//}
 
 #pragma mark -
 #pragma mark Table view data source
@@ -318,12 +258,9 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
 	picker.parent = self;
 
     
-    if(!IS_IOS8) {
-        picker.assetGroup = [self.assetGroups objectAtIndex:indexPath.row];
-        [((ALAssetsGroup *)picker.assetGroup) setAssetsFilter:[self assetFilter]];
-    }else {
+   
         picker.assetGroup = [[self.assetGroups objectAtIndex:indexPath.row] allValues][0];
-    }
+    
 	picker.assetPickerFilterDelegate = self.assetPickerFilterDelegate;
 	
 	[self.navigationController pushViewController:picker animated:YES];
