@@ -29,8 +29,8 @@
 @implementation ELCAssetTablePicker
 
 static NSInteger const kELCAssetTablePickerColumns = 4;
-static CGFloat const kELCAssetCellPadding = 4.0f;
-static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
+static CGFloat const kELCAssetCellPadding = 1.0f;
+static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
 
 - (void)viewDidLoad
 {
@@ -253,7 +253,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 80.0f;
     if (_toolbar.alpha == 1)
         return;
     
-    [self showToolbar];
+//    [self showToolbar];
 }
 
 - (BOOL)shouldDeselectAsset:(ELCAsset *)asset

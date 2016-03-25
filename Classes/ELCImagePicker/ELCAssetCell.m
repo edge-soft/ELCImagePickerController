@@ -109,14 +109,16 @@
             if (i < [_imageViewArray count]) {
                 UIImageView *imageView = [_imageViewArray objectAtIndex:i];
                 PHAsset *phAsset = (PHAsset *)asset.asset;
-                [self.imageManager requestImageForAsset:phAsset targetSize:CGSizeMake(70, 70) contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * result, NSDictionary * info) {
+                [self.imageManager requestImageForAsset:phAsset targetSize:CGSizeMake(100, 100) contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * result, NSDictionary * info) {
                     imageView.image = result;
                 }];
                 
             } else {
-                UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 70, 70)];
+                UIImageView *imageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+                imageView.contentMode = UIViewContentModeScaleAspectFill;
+                imageView.clipsToBounds = true;
                 PHAsset *phAsset = (PHAsset *)asset.asset;
-                [self.imageManager requestImageForAsset:phAsset targetSize:CGSizeMake(70, 70) contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * result, NSDictionary * info) {
+                [self.imageManager requestImageForAsset:phAsset targetSize:CGSizeMake(100, 100) contentMode:PHImageContentModeAspectFill options:options resultHandler:^(UIImage * result, NSDictionary * info) {
                     imageView.image = result;
                 }];
                 
