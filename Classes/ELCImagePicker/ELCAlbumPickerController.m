@@ -68,6 +68,7 @@ static CGSize const kAlbumThumbnailSize1 = {70.0f , 70.0f};
     PHFetchOptions *options = [[PHFetchOptions alloc] init];
     options.predicate = [NSPredicate predicateWithFormat:@"mediaType in %@", @[@(PHAssetMediaTypeImage)]];
     options.sortDescriptors = @[[NSSortDescriptor sortDescriptorWithKey:@"creationDate" ascending:TRUE]];
+    options.wantsIncrementalChangeDetails = NO;
     PHFetchResult *assetsFetchResult = [PHAsset fetchAssetsWithOptions:options];
     
     [self.assetGroups addObject:@{@"All Photos":assetsFetchResult}];

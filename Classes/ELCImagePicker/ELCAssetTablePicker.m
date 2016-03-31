@@ -62,6 +62,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
 
     NSMutableArray *tempArray = [[NSMutableArray alloc] init];
     self.elcAssets = tempArray;
+    self.elcAssetsLock = [[NSLock alloc] init];
     
     if (self.immediateReturn) {
         
@@ -123,10 +124,14 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
 - (void)preparePhotos
 {
     @autoreleasepool {
-        
+//        if (self.elcAssets == nil) {
+//            self.elcAssets = [[NSMutableArray alloc] init];
+//        }
+        [self.elcAssetsLock lock];
         [self.elcAssets removeAllObjects];
         
             PHFetchResult *tempFetchResult = (PHFetchResult *)self.assetGroup;
+        NSLog(@"Totoal results in the ground: %lu", (unsigned long)tempFetchResult.count);
             for (int k =0; k < tempFetchResult.count; k++) {
                 PHAsset *asset = tempFetchResult[k];
                 ELCAsset *elcAsset = [[ELCAsset alloc] initWithAsset:asset];
@@ -143,7 +148,8 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
                     [self.elcAssets addObject:elcAsset];
                 }
             }
-            
+        [self.elcAssetsLock unlock];
+        
             dispatch_sync(dispatch_get_main_queue(), ^{
                 [self.tableView reloadData];
                 // scroll to bottom
@@ -167,7 +173,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
 - (void)doneAction:(id)sender
 {	
     NSMutableArray *selectedAssetsImages = [[NSMutableArray alloc] init];
-	    
+    [self.elcAssetsLock lock];
 	for (ELCAsset *elcAsset in self.elcAssets) {
 		if ([elcAsset selected]) {
 			[selectedAssetsImages addObject:elcAsset];
@@ -176,6 +182,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
     if ([[ELCConsole mainConsole] onOrder]) {
         [selectedAssetsImages sortUsingSelector:@selector(compareWithIndex:)];
     }
+    [self.elcAssetsLock unlock];
     [self.parent selectedAssets:selectedAssetsImages];
 }
 
@@ -183,9 +190,11 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
 - (BOOL)shouldSelectAsset:(ELCAsset *)asset
 {
     NSUInteger selectionCount = 0;
+    [self.elcAssetsLock lock];
     for (ELCAsset *elcAsset in self.elcAssets) {
         if (elcAsset.selected) selectionCount++;
     }
+    [self.elcAssetsLock unlock];
     BOOL shouldSelect = YES;
     if ([self.parent respondsToSelector:@selector(shouldSelectAsset:previousCount:)]) {
         shouldSelect = [self.parent shouldSelectAsset:asset previousCount:selectionCount];
@@ -196,12 +205,13 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
 - (void)assetSelected:(ELCAsset *)asset
 {
     if (self.singleSelection) {
-
+        [self.elcAssetsLock lock];
         for (ELCAsset *elcAsset in self.elcAssets) {
             if (asset != elcAsset) {
                 elcAsset.selected = NO;
             }
         }
+        [self.elcAssetsLock unlock];
     }
     if (self.immediateReturn) {
         NSArray *singleAssetArray = @[asset];
@@ -225,11 +235,13 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
 - (void)assetDeselected:(ELCAsset *)asset
 {
     if (self.singleSelection) {
+        [self.elcAssetsLock lock];
         for (ELCAsset *elcAsset in self.elcAssets) {
             if (asset != elcAsset) {
                 elcAsset.selected = NO;
             }
         }
+        [self.elcAssetsLock unlock];
     }
 
     if (self.immediateReturn) {
@@ -240,7 +252,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
     int numOfSelectedElements = [[ELCConsole mainConsole] numOfSelectedElements];
     if (asset.index < numOfSelectedElements - 1) {
         NSMutableArray *arrayOfCellsToReload = [[NSMutableArray alloc] initWithCapacity:1];
-        
+        [self.elcAssetsLock lock];
         for (int i = 0; i < [self.elcAssets count]; i++) {
             ELCAsset *assetInArray = [self.elcAssets objectAtIndex:i];
             if (assetInArray.selected && (assetInArray.index > asset.index)) {
@@ -260,6 +272,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
                 }
             }
         }
+        [self.elcAssetsLock unlock];
         [self.tableView reloadRowsAtIndexPaths:arrayOfCellsToReload withRowAnimation:UITableViewRowAnimationNone];
     }
     
@@ -269,6 +282,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
 }
 
 - (void)assetSelectAll {
+    [self.elcAssetsLock lock];
     for (int i = 0; i < self.elcAssets.count; i++) {
         ELCAsset *elcAsset = [self.elcAssets objectAtIndex:i];
         if (elcAsset.selected)
@@ -284,13 +298,16 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
         elcAsset.index = [[ELCConsole mainConsole] numOfSelectedElements];
         [[ELCConsole mainConsole] addIndex:elcAsset.index];
     }
+    [self.elcAssetsLock unlock];
     [self.tableView reloadData];
 }
 
 - (void)assetDeselectAll {
+    [self.elcAssetsLock lock];
     for (ELCAsset *elcAsset in self.elcAssets) {
         elcAsset.selected = NO;
     }
+    [self.elcAssetsLock unlock];
     [[ELCConsole mainConsole] removeAllIndex];
     
     [self.tableView reloadData];
@@ -310,14 +327,20 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
     if (self.columns <= 0) { //Sometimes called before we know how many columns we have
         self.columns = kELCAssetTablePickerColumns;
     }
-    return ceil([self.elcAssets count] / (float)self.columns);
+    [self.elcAssetsLock lock];
+    NSInteger res = ceil([self.elcAssets count] / (float)self.columns);
+    [self.elcAssetsLock unlock];
+    return res;
 }
 
 - (NSArray *)assetsForIndexPath:(NSIndexPath *)path
 {
     long index = path.row * self.columns;
     long length = MIN(self.columns, [self.elcAssets count] - index);
-    return [self.elcAssets subarrayWithRange:NSMakeRange(index, length)];
+    [self.elcAssetsLock lock];
+    NSArray *res = [self.elcAssets subarrayWithRange:NSMakeRange(index, length)];
+    [self.elcAssetsLock unlock];
+    return res;
 }
 
 // Customize the appearance of table view cells.
@@ -349,12 +372,13 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
 - (int)totalSelectedAssets
 {
     int count = 0;
-    
+    [self.elcAssetsLock lock];
     for (ELCAsset *asset in self.elcAssets) {
 		if (asset.selected) {
             count++;	
 		}
 	}
+    [self.elcAssetsLock unlock];
     
     return count;
 }
@@ -364,10 +388,10 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
 -(void)photoLibraryDidChange:(PHChange *)changeInstance {
     PHFetchResultChangeDetails *changeDetails = [changeInstance changeDetailsForFetchResult:(PHFetchResult*)self.assetGroup];
     
-    if(changeDetails) {
-        self.assetGroup = [changeDetails fetchResultAfterChanges];
-        [self preparePhotos];
-    }
+//    if(changeDetails) {
+//        self.assetGroup = [changeDetails fetchResultAfterChanges];
+//        [self preparePhotos];
+//    }
 }
 
 #pragma mark - Toolbar
