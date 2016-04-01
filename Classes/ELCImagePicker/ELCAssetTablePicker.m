@@ -386,7 +386,7 @@ static CGFloat const kELCAssetDefaultItemWidth = 100.0f;
 #pragma mark - Photo Library Observer 
 
 -(void)photoLibraryDidChange:(PHChange *)changeInstance {
-    PHFetchResultChangeDetails *changeDetails = [changeInstance changeDetailsForFetchResult:(PHFetchResult*)self.assetGroup];
+//    PHFetchResultChangeDetails *changeDetails = [changeInstance changeDetailsForFetchResult:(PHFetchResult*)self.assetGroup];
     
 //    if(changeDetails) {
 //        self.assetGroup = [changeDetails fetchResultAfterChanges];
